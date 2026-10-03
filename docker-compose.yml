@@ -1,0 +1,81 @@
+name: practical1-q10
+x-lakekeeper-env: &lakekeeper-env
+  LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://lakekeeper:lakekeeper@postgres:5432/lakekeeper
+  LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://lakekeeper:lakekeeper@postgres:5432/lakekeeper
+  LAKEKEEPER__PG_ENCRYPTION_KEY: local-practical-encryption-key
+  LAKEKEEPER__AUTHZ_BACKEND: allowall
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: lakekeeper
+      POSTGRES_PASSWORD: lakekeeper
+      POSTGRES_DB: lakekeeper
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U lakekeeper -d lakekeeper]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+  minio:
+    image: ghcr.io/coollabsio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports: ['127.0.0.1:9000:9000', '127.0.0.1:9001:9001']
+    volumes: [minio-data:/data]
+  bucket:
+    image: ghcr.io/coollabsio/minio:RELEASE.2025-04-22T22-12-26Z
+    depends_on: [minio]
+    entrypoint: [/bin/sh, -c]
+    command:
+      - >-
+        until mc alias set local http://minio:9000 minioadmin minioadmin123; do sleep 2; done;
+        mc mb --ignore-existing local/warehouse
+  migrate:
+    image: quay.io/lakekeeper/catalog:latest-main
+    environment: *lakekeeper-env
+    command: [migrate]
+    depends_on:
+      postgres: {condition: service_healthy}
+  lakekeeper:
+    image: quay.io/lakekeeper/catalog:latest-main
+    environment: *lakekeeper-env
+    command: [serve]
+    ports: ['127.0.0.1:8181:8181']
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      bucket: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, /home/nonroot/lakekeeper, healthcheck]
+      interval: 3s
+      timeout: 10s
+      retries: 60
+  trino:
+    image: trinodb/trino:483
+    ports: ['127.0.0.1:8080:8080']
+    volumes:
+      - ./trino/catalog:/etc/trino/catalog:ro
+      - ./trino/config.properties:/etc/trino/config.properties:ro
+      - ./trino/jvm.config:/etc/trino/jvm.config:ro
+      - ./trino/node.properties:/etc/trino/node.properties:ro
+      - trino-data:/data/trino
+    depends_on:
+      lakekeeper: {condition: service_healthy}
+  superset:
+    build: ./superset
+    environment:
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+    ports: ['127.0.0.1:8088:8088']
+    volumes:
+      - ./superset/superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ./superset/start.sh:/app/start-practical.sh:ro
+      - superset-data:/app/superset_home
+    command: [/bin/sh, /app/start-practical.sh]
+    depends_on: [trino]
+volumes:
+  postgres-data:
+  minio-data:
+  trino-data:
+  superset-data:

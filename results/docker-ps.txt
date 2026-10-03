@@ -1,0 +1,6 @@
+NAME                          IMAGE                                                   COMMAND                  SERVICE      CREATED         STATUS                   PORTS
+practical1-q10-lakekeeper-1   quay.io/lakekeeper/catalog:latest-main                  "/home/nonroot/lakek…"   lakekeeper   5 minutes ago   Up 5 minutes (healthy)   127.0.0.1:8181->8181/tcp
+practical1-q10-minio-1        ghcr.io/coollabsio/minio:RELEASE.2025-04-22T22-12-26Z   "/usr/bin/docker-ent…"   minio        5 minutes ago   Up 5 minutes             127.0.0.1:9000-9001->9000-9001/tcp
+practical1-q10-postgres-1     postgres:17                                             "docker-entrypoint.s…"   postgres     5 minutes ago   Up 5 minutes (healthy)   5432/tcp
+practical1-q10-superset-1     practical1-q10-superset                                 "/bin/sh /app/start-…"   superset     5 minutes ago   Up 5 minutes (healthy)   127.0.0.1:8088->8088/tcp
+practical1-q10-trino-1        trinodb/trino:483                                       "/usr/lib/trino/bin/…"   trino        5 minutes ago   Up 5 minutes (healthy)   127.0.0.1:8080->8080/tcp

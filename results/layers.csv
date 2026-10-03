@@ -1,0 +1,8 @@
+﻿layer,table,rows,data_MB,format,codec,partitioning
+Bronze,customer,150000,7.588817,PARQUET,ZSTD,нет
+Bronze,orders,1500000,6.983746,PARQUET,ZSTD,нет
+Bronze,lineitem,6001215,33.488312,PARQUET,ZSTD,нет
+Bronze,nation,25,0.000606,PARQUET,ZSTD,нет
+Silver,customer_nation,150000,7.603909,PARQUET,ZSTD,нет
+Silver,returned_order_items,114705,1.778221,PARQUET,ZSTD,нет
+Gold,q10_top20,20,0.003221,PARQUET,ZSTD,нет

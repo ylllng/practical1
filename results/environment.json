@@ -1,0 +1,7 @@
+{
+  "platform": "macOS-15.0-arm64-arm-64bit-Mach-O",
+  "cpu_count_host": 8,
+  "sf": "1",
+  "trino": "483",
+  "repeats": 5
+}

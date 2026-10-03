@@ -1,0 +1,17 @@
+{
+  "bench_parquet_gzip_matches_q10": true,
+  "bench_parquet_zstd_matches_q10": true,
+  "bench_orc_zstd_matches_q10": true,
+  "bench_orc_snappy_matches_q10": true,
+  "gold_matches_q10": true,
+  "customer_rows_preserved": true,
+  "invalid_lineitems": 0,
+  "duplicate_lineitem_keys": 0,
+  "orphan_orders": 0,
+  "orphan_lineitems": 0,
+  "schema_evolution_nulls": true,
+  "demo_insert": true,
+  "time_travel": true,
+  "rollback": true,
+  "snapshot_id": 2884159182053332328
+}
